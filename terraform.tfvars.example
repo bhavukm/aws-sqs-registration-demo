@@ -1,0 +1,3 @@
+# Copy this file to terraform.tfvars if you want to customize the settings.
+aws_region  = "us-east-1"
+project_name = "sre-sqs-registration-demo"
