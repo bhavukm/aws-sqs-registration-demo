@@ -67,6 +67,10 @@ Registration request (AWS CLI for this demo)
 ```
 <img width="727" height="600" alt="image" src="https://github.com/user-attachments/assets/c6b45d67-2d80-4d31-96c6-428beaaa8741" />
 
+### How the Worker Lambda Fetches Messages from SQS
+
+AWS Lambda automatically polls the SQS queue through an Event Source Mapping configured in Terraform. Whenever messages are available, Lambda fetches up to 5 messages at a time and passes them to the Worker Lambda for processing. It does not run on a fixed schedule; AWS manages the polling automatically, typically processing messages within seconds. If processing succeeds, the messages are deleted from the queue. If processing fails, the messages can be retried and eventually moved to the Dead-Letter Queue (DLQ) after repeated failures. We can control batch size, processing concurrency, visibility timeout, and retry behavior through configuration.
+
 
 For simplicity, we invoke the Producer Lambda using the AWS CLI. This avoids adding an API Gateway or website to the demo. The SQS-to-Lambda integration is real: AWS polls the queue and invokes the Worker Lambda automatically.
 
