@@ -177,7 +177,7 @@ Check the DLQ in the AWS Console under **Amazon SQS**, or inspect its approximat
 ```bash
 aws sqs get-queue-attributes \
   --queue-url "$(terraform output -raw dead_letter_queue_url)" \
-  --attribute-names ApproximateNumberOfMessages
+  --attribute-names ApproximateNumberOfMessages ApproximateNumberOfMessagesNotVisible
 ```
 
 SQS metrics are approximate, and the redrive process takes time because it waits for retries and the visibility timeout. If the count has not changed, wait and check again. You can also use **CloudWatch → Log groups** to inspect the worker errors.
