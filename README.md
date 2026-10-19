@@ -65,6 +65,8 @@ Registration request (AWS CLI for this demo)
                               |
                      Inspect and troubleshoot
 ```
+<img width="727" height="600" alt="image" src="https://github.com/user-attachments/assets/c6b45d67-2d80-4d31-96c6-428beaaa8741" />
+
 
 For simplicity, we invoke the Producer Lambda using the AWS CLI. This avoids adding an API Gateway or website to the demo. The SQS-to-Lambda integration is real: AWS polls the queue and invokes the Worker Lambda automatically.
 
