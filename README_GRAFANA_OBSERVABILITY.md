@@ -130,6 +130,127 @@ Optional: add another Lambda panel for `Duration` using statistic `Average` and 
 
 **Generate some traffic:**
 
+**Option 1:**
+
+## Option 2: Generate Traffic Using the Python Traffic Generator
+
+Use this option to generate synthetic traffic for testing the AWS SQS monitoring dashboard in Grafana.
+
+The traffic generator creates:
+- **100 successful registration messages** that are processed by the Worker Lambda.
+- **100 intentional failure messages** that are retried and eventually moved to the Dead Letter Queue (DLQ).
+
+All messages are initially sent to the main SQS queue through the Producer Lambda. The Worker Lambda processes successful messages and intentionally rejects failure messages. SQS automatically moves repeatedly failing messages to the DLQ based on the configured redrive policy.
+
+### Step 1: Navigate to the project directory
+
+Open your WSL terminal and execute:
+
+```bash
+cd aws-sqs-registration-demo
+```
+
+### Step 2: Generate the Python traffic generator
+
+If you have saved the Bash script containing the Python heredoc in `gen.py`, execute it using Bash:
+
+```bash
+bash gen.py
+```
+
+**Important:** Do not execute `python3 gen.py`. This file contains a Bash command (`cat`), not Python code.
+
+The command creates the actual Python script:
+
+```text
+generate_traffic.py
+```
+
+### Step 3: Install the required Python dependency
+
+Activate your Python virtual environment and run:
+
+```bash
+python3 -m pip install boto3
+```
+
+### Step 4: Validate the Python script
+
+Run:
+
+```bash
+python3 -m py_compile generate_traffic.py
+```
+
+No output indicates that Python syntax compilation was successful.
+
+### Step 5: Generate traffic
+
+Execute:
+
+```bash
+python3 generate_traffic.py
+```
+
+By default, the script generates:
+
+| Message Type | Count |
+|---|---:|
+| Successful registrations | 100 |
+| Intentional failure messages | 100 |
+| **Total messages** | **200** |
+
+You can also customize the traffic volume:
+
+```bash
+python3 generate_traffic.py \
+  --success-count 200 \
+  --dlq-count 200 \
+  --concurrency 5
+```
+
+### Step 6: Verify SQS queue processing
+
+Check the main SQS queue:
+
+```bash
+aws sqs get-queue-attributes \
+  --queue-url "$(terraform output -raw registration_queue_url)" \
+  --attribute-names ApproximateNumberOfMessages ApproximateNumberOfMessagesNotVisible \
+  --region "$(terraform output -raw aws_region)"
+```
+
+Check the Dead Letter Queue:
+
+```bash
+aws sqs get-queue-attributes \
+  --queue-url "$(terraform output -raw dead_letter_queue_url)" \
+  --attribute-names ApproximateNumberOfMessages ApproximateNumberOfMessagesNotVisible \
+  --region "$(terraform output -raw aws_region)"
+```
+
+Allow some time for Lambda processing, message retries and DLQ movement.
+
+### Step 7: Verify metrics in Grafana
+
+Open your Grafana dashboard and refresh it. Select an appropriate time range, such as **Last 1 hour** or **Last 6 hours**.
+
+You should be able to observe:
+
+- Main SQS queue backlog.
+- Number of messages sent, received and deleted.
+- Dead Letter Queue backlog.
+- Oldest message age.
+- Message processing activity.
+
+**Expected outcome:** Successful messages should be processed and removed from the main queue, while intentional failure messages should eventually appear in the DLQ.
+
+**Note:** The DLQ is populated automatically through the SQS redrive policy. The traffic generator does not send messages directly to the DLQ.
+
+
+
+**Option 2:**
+
 # Create a virtual environment named 'venv'
 
 python3 -m venv venv
