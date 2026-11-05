@@ -128,6 +128,26 @@ Optional: add another Lambda panel for `Duration` using statistic `Average` and 
 
 **Metric note:** SQS queue metrics are approximate. Some queue metrics may not emit points while the queue is inactive, so a blank panel does not always mean a failure. Send the valid sample message from Section 7 and run the failure demo from Section 8 to populate the charts. SQS metric names and meanings are documented in the [AWS SQS metrics reference](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-available-cloudwatch-metrics.html).
 
+**Generate some traffic:**
+
+# Create a virtual environment named 'venv'
+
+python3 -m venv venv
+
+# Activate it (Mac/Linux)
+
+source venv/bin/activate
+
+# Activate it (Windows PowerShell)
+
+# .\venv\Scripts\Activate.ps1
+
+python3 -m pip install --upgrade pip
+
+python3 -m pip install boto3
+
+python3 generate_traffic.py
+
 ### 11.6 Create Grafana alerts
 
 In Grafana, open **Alerting → Alert rules → New alert rule**. For each rule, create a CloudWatch metric query, then add a **Reduce** expression (use `Last`) and a **Threshold** expression. Set an evaluation interval and a pending period, then save the rule.
